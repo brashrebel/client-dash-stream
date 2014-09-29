@@ -100,6 +100,9 @@ function cd_stream() {
 				null,
 				$this->version
 			);
+            $file_tmpl = 'ui/timeago/locale/jquery.timeago.%s.js';
+            wp_register_script( 'timeago-locale', WP_STREAM_URL . sprintf( $file_tmpl, 'en' ), array( 'timeago' ), '1' );
+            wp_register_style( 'select2', WP_STREAM_URL . 'ui/select2/select2.css', array(), '3.5.1' );
 		}
 
 		/**
@@ -124,8 +127,40 @@ function cd_stream() {
 			     || ( $current_page == 'cd_settings' && $current_tab == $settings_tab_ID )
 			     || ( $current_page == 'cd_account' && $current_tab == 'activity' )
 			) {
+                // Add stylesheet from this plugin
 				wp_enqueue_style( "$this->ID-style" );
-			}
+
+                // Add Stream stuff
+                wp_enqueue_style( 'wp-stream-admin', WP_STREAM_URL . 'ui/css/admin.css', array(), WP_Stream::VERSION );
+                wp_enqueue_script( 'select2' );
+                wp_enqueue_style( 'select2' );
+
+                wp_enqueue_script( 'timeago' );
+                wp_enqueue_script( 'timeago-locale' );
+
+                wp_enqueue_script( 'wp-stream-admin', WP_STREAM_URL . 'ui/js/admin.js', array( 'jquery', 'select2' ), WP_Stream::VERSION );
+                wp_enqueue_script( 'wp-stream-live-updates', WP_STREAM_URL . 'ui/js/live-updates.js', array( 'jquery', 'heartbeat' ), WP_Stream::VERSION );
+                wp_localize_script(
+                    'wp-stream-admin',
+                    'wp_stream',
+                    array(
+                        'i18n'       => array(
+                            'confirm_defaults' => __( 'Are you sure you want to reset all site settings to default? This cannot be undone.', 'stream' ),
+                        ),
+                        'gmt_offset' => get_option( 'gmt_offset' ),
+                    )
+                );
+                wp_localize_script(
+                    'wp-stream-live-updates',
+                    'wp_stream_live_updates',
+                    array(
+                        'current_screen' => $current_page,
+                        'current_page'   => $current_page,
+                        'current_order'  => isset( $_GET['order'] ) ? esc_js( $_GET['order'] ) : 'desc',
+                        'current_query'  => json_encode( $_GET ),
+                    )
+                );
+            }
 		}
 
 		/**
@@ -142,7 +177,8 @@ function cd_stream() {
 		}
 
 		public function activity_output() {
-			echo 'bla';
+            WP_Stream_Admin::register_list_table();
+            WP_Stream_Admin::render_stream_page();
 		}
 	}
 
