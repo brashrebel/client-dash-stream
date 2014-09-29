@@ -24,127 +24,142 @@ License: GPL2
  * Please and thank you.
  */
 function cd_stream() {
-    if ( ! class_exists( 'ClientDash' ) ) {
+	if ( ! class_exists( 'ClientDash' ) ) {
 
-        // Change me! Change me to the name of the notice function at the bottom
-        add_action( 'admin_notices', '_cd_stream_notice' );
-        return;
-    }
+		// Change me! Change me to the name of the notice function at the bottom
+		add_action( 'admin_notices', '_cd_stream_notice' );
 
-    class CDStream extends ClientDash {
+		return;
+	}
 
-        public $ID = 'cdstream';
+	class CDStream extends ClientDash {
 
-        private $page = 'Reports';
+		public $ID = 'cdstream';
 
-        private $tab = 'Stream';
+		private $page = 'Reports';
 
-        private $settings_tab = 'Stream';
+		private $tab = 'Stream';
 
-        private $section_name = 'Stream';
+		private $settings_tab = 'Stream';
 
-        /**
-         * This is the current version of your plugin. Keep it up to do date!
-         */
-        public $version = '0.1';
+		private $section_name = 'Stream';
 
-        public static $_path;
+		/**
+		 * This is the current version of your plugin. Keep it up to do date!
+		 */
+		public $version = '0.1';
 
-        /**
-         * This constructor function sets up what happens when the plugin is activated. It is where you'll place all your
-         * actions, filters and other setup components.
-         *
-         * Don't worry about messing with this function.
-         */
-        public function __construct() {
+		public static $_path;
 
-            // Register our styles
-            add_action( 'admin_init', array( $this, 'register_styles' ) );
+		/**
+		 * This constructor function sets up what happens when the plugin is activated. It is where you'll place all your
+		 * actions, filters and other setup components.
+		 *
+		 * Don't worry about messing with this function.
+		 */
+		public function __construct() {
 
-            // Add our styles conditionally
-            add_action( 'admin_enqueue_scripts', array( $this, 'add_styles' ) );
+			// Register our styles
+			add_action( 'admin_init', array( $this, 'register_styles' ) );
 
-            // Add our new content section
-            $this->add_content_section(
-                array(
-                    'name'     => $this->section_name,
-                    'tab'      => $this->tab,
-                    'page'     => $this->page,
-                    'callback' => array( $this, 'section_output' )
-                )
-            );
+			// Add our styles conditionally
+			add_action( 'admin_enqueue_scripts', array( $this, 'add_styles' ) );
 
-            // Set the plugin path
-            $this::$_path = plugin_dir_path( __FILE__ );
-        }
+			// Add our new content section
+			$this->add_content_section(
+				array(
+					'name'     => $this->section_name,
+					'tab'      => $this->tab,
+					'page'     => $this->page,
+					'callback' => array( $this, 'reports_output' )
+				)
+			);
+			$this->add_content_section(
+				array(
+					'name'     => 'Your Activity',
+					'tab'      => 'Activity',
+					'page'     => 'Account',
+					'callback' => array( $this, 'activity_output' )
+				)
+			);
 
-        /**
-         * Register our styles.
-         *
-         * Feel free to modify or add to this example with your own.
-         */
-        public function register_styles() {
+			// Set the plugin path
+			$this::$_path = plugin_dir_path( __FILE__ );
+		}
 
-            wp_register_style(
-                "$this->ID-style",
-                $this::$_path . 'style.css',
-                null,
-                $this->version
-            );
-        }
+		/**
+		 * Register our styles.
+		 *
+		 * Feel free to modify or add to this example with your own.
+		 */
+		public function register_styles() {
 
-        /**
-         * Add our styles.
-         *
-         * If you want the styles to show up on the entire back-end, simply remove all but:
-         * wp_enqueue_style( "$this->ID-style" );
-         *
-         * Feel free to modify or add to this example with your own.
-         */
-        public function add_styles() {
+			wp_register_style(
+				"$this->ID-style",
+				plugins_url( 'style.css', __FILE__ ),
+				null,
+				$this->version
+			);
+		}
 
-            $current_page = isset( $_GET['page'] ) ? $_GET['page'] : null;
-            $current_tab  = isset( $_GET['tab'] ) ? $_GET['tab'] : null;
+		/**
+		 * Add our styles.
+		 *
+		 * If you want the styles to show up on the entire back-end, simply remove all but:
+		 * wp_enqueue_style( "$this->ID-style" );
+		 *
+		 * Feel free to modify or add to this example with your own.
+		 */
+		public function add_styles() {
 
-            $page_ID = $this->translate_name_to_id( $this->page );
-            $tab_ID = $this->translate_name_to_id( $this->tab );
-            $settings_tab_ID = $this->translate_name_to_id( $this->settings_tab );
+			$current_page = isset( $_GET['page'] ) ? $_GET['page'] : null;
+			$current_tab  = isset( $_GET['tab'] ) ? $_GET['tab'] : null;
 
-            // Only add style if on extension tab or on extension settings tab
-            if ( ( $current_page == $page_ID && $current_tab == $tab_ID )
-                 || ( $current_page == 'cd_settings' && $current_tab == $settings_tab_ID ) ) {
-                wp_enqueue_style( "$this->ID-style" );
-            }
-        }
+			$page_ID         = $this->translate_name_to_id( $this->page );
+			$tab_ID          = $this->translate_name_to_id( $this->tab );
+			$settings_tab_ID = $this->translate_name_to_id( $this->settings_tab );
 
-        /**
-         * Our section output.
-         *
-         * This is where all of the content section content goes! Add anything you like to this function.
-         *
-         * Feel free to modify or add to this example with your own.
-         */
-        public function section_output() {
+			// Only add style if on extension tab or on extension settings tab
+			if ( ( $current_page == $page_ID && $current_tab == $tab_ID )
+			     || ( $current_page == 'cd_settings' && $current_tab == $settings_tab_ID )
+			     || ( $current_page == 'cd_account' && $current_tab == 'activity' )
+			) {
+				wp_enqueue_style( "$this->ID-style" );
+			}
+		}
 
-            // CHANGE THIS
-            echo 'This is where your new content section\'s content goes.';
-        }
-    }
+		/**
+		 * Our section output.
+		 *
+		 * This is where all of the content section content goes! Add anything you like to this function.
+		 *
+		 * Feel free to modify or add to this example with your own.
+		 */
+		public function reports_output() {
 
-    // Instantiate the class
-    $CDStream = new CDStream();
+			// CHANGE THIS
+			echo 'This is where your new content section\'s content goes.';
+		}
 
-    // Include the file for your plugin settings. Simply remove or comment this line to disable the settings
-    // Remove if you don't want settings
-    //include_once( "{$CDStream::$_path}inc/settings.php" );
+		public function activity_output() {
+			echo 'bla';
+		}
+	}
 
-    // Include the file for your plugin widget. Simply remove or comment this line to disable the widget
-    // Remove if you don't want widgets
-    //include_once( "{$CDStream::$_path}inc/widgets.php" );
+	// Instantiate the class
+	$CDStream = new CDStream();
 
-    // Include the file for your plugin menus. Simply remove or comment this line to disable the widget
-    // Remove if you don't want menus
-    include_once( "{$CDStream::$_path}inc/menus.php" );
+	// Include the file for your plugin settings. Simply remove or comment this line to disable the settings
+	// Remove if you don't want settings
+	//include_once( "{$CDStream::$_path}inc/settings.php" );
+
+	// Include the file for your plugin widget. Simply remove or comment this line to disable the widget
+	// Remove if you don't want widgets
+	//include_once( "{$CDStream::$_path}inc/widgets.php" );
+
+	// Include the file for your plugin menus. Simply remove or comment this line to disable the widget
+	// Remove if you don't want menus
+	include_once( "{$CDStream::$_path}inc/menus.php" );
 }
 
 // Change me! Change me to the name of the function at the top.
@@ -157,11 +172,11 @@ add_action( 'plugins_loaded', 'cd_stream' );
  */
 function _cd_stream_notice() {
 
-    ?>
-    <div class="error">
-        <p>You have activated a plugin that requires <a href="http://w.org/plugins/client-dash">Client Dash</a>
-            version 1.6 or greater.
-            Please install and activate <strong>Client Dash</strong> to continue using.</p>
-    </div>
+	?>
+	<div class="error">
+		<p>You have activated a plugin that requires <a href="http://w.org/plugins/client-dash">Client Dash</a>
+			version 1.6 or greater.
+			Please install and activate <strong>Client Dash</strong> to continue using.</p>
+	</div>
 <?php
 }
