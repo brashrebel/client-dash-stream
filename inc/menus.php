@@ -26,16 +26,37 @@ class CDStream_Menus extends ClientDash_Menus_API {
      * Feel free to modify this example with your own.
      */
     private static $group_items = array(
-        'Tab 1' => array(
-            'Item 1' => array(
-                'url'  => '/options-general.php?page=cd_settings&tab=boilerplate',
-                'icon' => 'dashicons-smiley',
+        'Pages' => array(
+            'Stream' => array(
+                'url'  => '/admin.php?page=wp_stream',
+                'icon' => '',
+            ),
+            'Settings' => array(
+                'url'  => '/admin.php?page=wp_stream_settings',
+                'icon' => 'dashicons-admin-settings',
+            ),
+            'Account' => array(
+                'url'  => '/admin.php?page=wp_stream_account',
+                'icon' => 'dashicons-admin-users',
+            ),
+            'Notifications' => array(
+                'url'  => '/edit.php?post_type=stream_notification',
+                'icon' => 'dashicons-megaphone',
+            ),
+            'Reports' => array(
+                'url'  => '/admin.php?page=wp_stream_reports',
+                'icon' => 'dashicons-chart-area',
             ),
         ),
-        'Tab 2' => array(
-            'Item 1' => array(
-                'url'  => '/options-general.php?page=cd_settings&tab=boilerplate',
-                'icon' => 'dashicons-smiley',
+        'Tabs' => array(
+            'Settings' => 'separator',
+            'General' => array(
+                'url'  => '/admin.php?page=wp_stream_settings#0',
+                'icon' => 'dashicons-admin-generic',
+            ),
+            'Exclude' => array(
+                'url'  => '/admin.php?page=wp_stream_settings#1',
+                'icon' => 'dashicons-dismiss',
             ),
         ),
     );
@@ -61,13 +82,13 @@ class CDStream_Menus extends ClientDash_Menus_API {
      */
     public function add_new_menu_groups() {
 
-        self::add_menu_group( 'Boilerplate Group', array( __CLASS__, 'group_content' ) );
+        self::add_menu_group( 'Stream', array( __CLASS__, 'group_content' ) );
     }
 
     /**
      * This is the callback function for the example group we've created.
      *
-     * Inside of this you can add any HTML that you want, but it is recommended that you stil with just
+     * Inside of this you can add any HTML that you want, but it is recommended that you stick with just
      * using the supplied "group_output()" function. This function takes an array of tabs and items (currently
      * using the property from above) and outputs the menu items accordingly.
      *
@@ -75,7 +96,7 @@ class CDStream_Menus extends ClientDash_Menus_API {
      */
     public static function group_content() {
 
-        self::group_output( 'boilerplate_menu', self::$group_items );
+        self::group_output( 'cdstream_menu', self::$group_items );
     }
 }
 

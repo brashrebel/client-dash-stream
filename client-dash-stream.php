@@ -136,11 +136,11 @@ function cd_stream() {
 
     // Include the file for your plugin settings. Simply remove or comment this line to disable the settings
     // Remove if you don't want settings
-    include_once( "{$CDStream::$_path}inc/settings.php" );
+    //include_once( "{$CDStream::$_path}inc/settings.php" );
 
     // Include the file for your plugin widget. Simply remove or comment this line to disable the widget
     // Remove if you don't want widgets
-    include_once( "{$CDStream::$_path}inc/widgets.php" );
+    //include_once( "{$CDStream::$_path}inc/widgets.php" );
 
     // Include the file for your plugin menus. Simply remove or comment this line to disable the widget
     // Remove if you don't want menus
